@@ -39,8 +39,9 @@ function PricePage({ navigate }) {
           </span>
         </div>
 
-        {/* Price table */}
-        <div style={{ border:'1px solid #e8e8e8', overflow:'hidden' }}>
+        {/* Price table — horizontal scroll on mobile */}
+        <div style={{ overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
+          <div style={{ minWidth:520, border:'1px solid #e8e8e8', overflow:'hidden' }}>
           {/* Header */}
           <div style={{
             display:'grid', gridTemplateColumns:'2fr 1fr 1fr 1fr',
@@ -86,6 +87,7 @@ function PricePage({ navigate }) {
               </div>
             );
           })}
+          </div>
         </div>
 
         {/* Notes */}

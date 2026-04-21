@@ -15,10 +15,13 @@ function SalonPage({ salonId, navigate }) {
         padding:'160px 80px 80px', position:'relative', overflow:'hidden', minHeight:520,
         display:'flex', alignItems:'flex-end',
       }}>
-        {/* BG placeholder */}
+        {/* BG image */}
         <div style={{ position:'absolute', inset:0 }}>
-          <Placeholder label={`interior hero\n${salon.name}`} dark aspect="auto"/>
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(10,10,10,0.4) 60%,rgba(10,10,10,0.2) 100%)' }}/>
+          {salon.interiorImgs && salon.interiorImgs[0]
+            ? <img src={salon.interiorImgs[0]} alt={salon.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+            : <div style={{ width:'100%', height:'100%', background:`repeating-linear-gradient(45deg,#111 0,#111 1px,#1a1a1a 1px,#1a1a1a 20px)` }}/>
+          }
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(10,10,10,0.92) 0%,rgba(10,10,10,0.5) 60%,rgba(10,10,10,0.25) 100%)' }}/>
         </div>
         {/* Accent blob */}
         <div style={{
@@ -61,11 +64,17 @@ function SalonPage({ salonId, navigate }) {
         <Reveal><SectionLabel>interior</SectionLabel></Reveal>
         <Reveal delay={0.05}><h2 style={{ fontSize:'clamp(32px,3.5vw,48px)', fontWeight:300, letterSpacing:'-0.02em', textTransform:'lowercase', marginBottom:48 }}>the space.</h2></Reveal>
         <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:2, marginBottom:2 }} className="grid-salon-gallery">
-          <div style={{ gridRow:'span 2' }}><Placeholder label={`interior photo\n${salon.name} 01`} dark aspect="auto" style={{ height:'100%' }}/></div>
-          <div><Placeholder label={`interior photo\n${salon.name} 02`} dark aspect="4/3"/></div>
-          <div><Placeholder label={`interior photo\n${salon.name} 03`} dark aspect="4/3"/></div>
-          <div><Placeholder label={`interior photo\n${salon.name} 04`} dark aspect="4/3"/></div>
-          <div><Placeholder label={`interior photo\n${salon.name} 05`} dark aspect="4/3"/></div>
+          {[0,1,2,3,4].map(i => {
+            const src = salon.interiorImgs && salon.interiorImgs[i];
+            return (
+              <div key={i} style={ i===0 ? { gridRow:'span 2' } : {} }>
+                {src
+                  ? <img src={src} alt={`${salon.name} ${i+1}`} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', aspectRatio: i===0 ? undefined : '4/3' }}/>
+                  : <Placeholder label={`interior ${i+1}`} dark aspect={i===0 ? 'auto' : '4/3'}/>
+                }
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -83,17 +92,49 @@ function SalonPage({ salonId, navigate }) {
         {lightbox && <Lightbox work={lightbox} onClose={() => setLightbox(null)}/>}
       </section>
 
-      {/* Stylists */}
+      {/* Stylists — compact horizontal cards */}
       {stylists.length > 0 && (
         <section style={{ padding:'0 80px 100px' }}>
           <Reveal><SectionLabel>stylists</SectionLabel></Reveal>
           <Reveal delay={0.05}><h2 style={{ fontSize:'clamp(32px,3.5vw,48px)', fontWeight:300, letterSpacing:'-0.02em', textTransform:'lowercase', marginBottom:48 }}>your specialists.</h2></Reveal>
           <div style={{ display:'grid', gridTemplateColumns:`repeat(${Math.min(stylists.length,3)},1fr)`, gap:2 }} className="grid-responsive-3">
-            {stylists.map((s, i) => (
-              <Reveal key={s.id} delay={i*0.1}>
-                <StylistCard stylist={s} onClick={() => navigate(`/stylists/${s.id}`)}/>
-              </Reveal>
-            ))}
+            {stylists.map((s, i) => {
+              const [hov, setSHov] = useSalonState(false);
+              return (
+                <div key={s.id}
+                  onMouseEnter={() => setSHov(true)} onMouseLeave={() => setSHov(false)}
+                  onClick={() => navigate(`/stylists/${s.id}`)}
+                  style={{ cursor:'pointer', display:'grid', gridTemplateColumns:'120px 1fr', gap:0, background:'#fff', border:'1px solid #ebebeb', transition:'border-color 0.2s', ...(hov ? {borderColor:'#0A0A0A'} : {}) }}>
+                  {/* Portrait — fixed small size */}
+                  <div style={{ width:120, height:160, overflow:'hidden', flexShrink:0, background:'#f0f0f0' }}>
+                    {s.portraitImg
+                      ? <img src={s.portraitImg} alt={s.nameEn}
+                          style={{ width:'100%', height:'100%', objectFit:'cover', display:'block',
+                            filter: hov ? 'grayscale(0)' : 'grayscale(0.5)',
+                            transform: hov ? 'scale(1.05)' : 'scale(1)',
+                            transition:'filter 0.4s, transform 0.5s cubic-bezier(.16,1,.3,1)',
+                          }}/>
+                      : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                          <span style={{ fontFamily:'Courier New,monospace', fontSize:8, color:'rgba(10,10,10,0.2)' }}>{s.nameEn}</span>
+                        </div>
+                    }
+                  </div>
+                  {/* Info */}
+                  <div style={{ padding:'16px 20px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                      <RankBadge rank={s.rank}/>
+                    </div>
+                    <div style={{ fontSize:14, fontWeight:400, marginBottom:3 }}>{s.nameEn}</div>
+                    <div className="jp" style={{ fontSize:11, color:'#888', marginBottom:10 }}>{s.nameJp}</div>
+                    <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                      {s.tags.map(t => (
+                        <span key={t} style={{ fontSize:9, letterSpacing:'0.08em', color:'#aaa' }}>{t}</span>
+                      )).reduce((acc, el, i) => i === 0 ? [el] : [...acc, <span key={`sep-${i}`} style={{color:'#ddd',fontSize:9}}> / </span>, el], [])}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
@@ -146,12 +187,20 @@ function SalonPage({ salonId, navigate }) {
         <Reveal delay={0.05}><h2 style={{ fontSize:'clamp(32px,3.5vw,48px)', fontWeight:300, letterSpacing:'-0.02em', textTransform:'lowercase', color:'#fff', marginBottom:56 }}>find us.</h2></Reveal>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1.2fr', gap:60, alignItems:'start' }} className="grid-responsive-2">
           <div>
-            {/* Map */}
-            <div style={{ aspectRatio:'16/10', background:'#161616', border:'1px solid rgba(255,255,255,0.08)', position:'relative', overflow:'hidden', marginBottom:32 }}>
-              <div dangerouslySetInnerHTML={{ __html: salon.mapSvg }} style={{ position:'absolute', inset:0, width:'100%', height:'100%' }}/>
-              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
-                <div style={{ fontFamily:'Courier New,monospace', fontSize:9, color:'rgba(255,255,255,0.15)', letterSpacing:'0.12em', textAlign:'center', lineHeight:2 }}>map placeholder<br/>{salon.name}</div>
-              </div>
+            {/* Google Maps embed */}
+            <div style={{ aspectRatio:'16/10', position:'relative', overflow:'hidden', marginBottom:32, border:'1px solid rgba(255,255,255,0.08)' }}>
+              {salon.mapEmbed
+                ? <iframe
+                    src={salon.mapEmbed}
+                    width="100%" height="100%"
+                    style={{ border:0, display:'block', filter:'invert(0.9) hue-rotate(180deg) saturate(0.4)' }}
+                    allowFullScreen loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`Map — ${salon.name}`}/>
+                : <div style={{ width:'100%', height:'100%', background:'#161616', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontFamily:'Courier New,monospace', fontSize:9, color:'rgba(255,255,255,0.15)' }}>map — {salon.name}</span>
+                  </div>
+              }
             </div>
           </div>
           <div>

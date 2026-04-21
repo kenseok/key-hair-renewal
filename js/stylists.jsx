@@ -73,16 +73,18 @@ function StylistProfilePage({ stylistId, navigate }) {
       }} className="grid-responsive-2">
         {/* Portrait */}
         <div style={{ position:'relative' }}>
-          <div style={{
-            aspectRatio:'3/4',
-            background:`repeating-linear-gradient(90deg,#1a1a1a 0,#1a1a1a 1px,#222 1px,#222 16px)`,
-            filter:'grayscale(1)',
-            position:'relative', overflow:'hidden',
-          }}>
-            <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#8FB8E6,#F4C4D1,#C8B4E0)', opacity:0.15 }}/>
-            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <div style={{ fontFamily:'Courier New,monospace', fontSize:9, color:'rgba(255,255,255,0.15)', letterSpacing:'0.12em', textAlign:'center', lineHeight:2 }}>portrait<br/>{stylist.nameEn}</div>
-            </div>
+          <div style={{ aspectRatio:'3/4', position:'relative', overflow:'hidden', background:'#1a1a1a' }}>
+            {stylist.portraitImg
+              ? <img src={stylist.portraitImg} alt={stylist.nameEn}
+                  style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', filter:'grayscale(0.2)' }}/>
+              : <>
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#8FB8E6,#F4C4D1,#C8B4E0)', opacity:0.15 }}/>
+                  <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ fontFamily:'Courier New,monospace', fontSize:9, color:'rgba(255,255,255,0.15)', letterSpacing:'0.12em', textAlign:'center', lineHeight:2 }}>portrait<br/>{stylist.nameEn}</div>
+                  </div>
+                </>
+            }
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(10,10,10,0.45) 0%,transparent 50%)' }}/>
           </div>
           {/* Instagram handle */}
           <div style={{ position:'absolute', bottom:16, left:16, fontSize:10, letterSpacing:'0.1em', color:'rgba(255,255,255,0.5)' }}>{stylist.instagram}</div>

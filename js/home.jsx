@@ -5,20 +5,64 @@ function HomePage({ navigate }) {
 
   // ── Hero ─────────────────────────────────────────────
   function Hero() {
+    const wrapperRef = useHomeRef(null);
+    const bgRef = useHomeRef(null);
+    const hasHeroImg = !!KEY_DATA.heroImg;
+
+    useHomeEffect(() => {
+      const onScroll = () => {
+        if (!bgRef.current) return;
+        const scrollY = window.scrollY;
+        bgRef.current.style.transform = `translateY(${scrollY * 0.45}px)`;
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
     return (
-      <div style={{ position:'relative', height:'180vh' }}>
+      <div ref={wrapperRef} style={{ position:'relative', height:'100vh' }}>
+        {/* Sticky viewport */}
         <div style={{
           position:'sticky', top:0, height:'100vh',
           display:'flex', alignItems:'center', justifyContent:'center',
           overflow:'hidden',
+          background: '#0A0A0A',
+          zIndex: 0,
         }}>
-          {/* Blob */}
-          <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
+          {/* Parallax BG image — moves slower than scroll */}
+          {hasHeroImg && (
+            <img
+              ref={bgRef}
+              src={KEY_DATA.heroImg}
+              alt="k.e.y hair & make"
+              style={{
+                position:'absolute',
+                top:'-15%', left:0, right:0,
+                width:'100%', height:'130%',
+                objectFit:'cover',
+                objectPosition:'center top',
+                opacity:0.55,
+                display:'block',
+                willChange:'transform',
+              }}
+            />
+          )}
+
+          {/* Gradient overlay */}
+          <div style={{
+            position:'absolute', inset:0,
+            background:'linear-gradient(to bottom,rgba(10,10,10,0.2) 0%,rgba(10,10,10,0.55) 70%,rgba(10,10,10,0.85) 100%)',
+          }}/>
+
+          {/* Subtle blob accent */}
+          <div style={{
+            position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none',
+          }}>
             <div style={{
               position:'absolute', width:'70vw', height:'70vw', maxWidth:900, maxHeight:900,
               left:'50%', top:'50%', transform:'translate(-50%,-50%)',
               background:'linear-gradient(135deg,#8FB8E6,#F4C4D1,#C8B4E0)',
-              filter:'blur(120px)', opacity:0.35,
+              filter:'blur(140px)', opacity:0.1,
               borderRadius:'60% 40% 30% 70% / 60% 30% 70% 40%',
               animation:'blobMorph 20s ease-in-out infinite',
             }}/>
@@ -31,12 +75,14 @@ function HomePage({ navigate }) {
                 onClick={e => { e.preventDefault(); navigate(`/salon/${s.id}`); }}
                 style={{
                   fontSize:10, fontWeight:500, letterSpacing:'0.15em',
-                  padding:'5px 12px', border:'1px solid rgba(10,10,10,0.2)',
-                  transition:'border-color 0.2s', cursor:'pointer',
-                  color:'#0A0A0A',
+                  padding:'5px 12px',
+                  border:'1px solid rgba(255,255,255,0.35)',
+                  transition:'border-color 0.2s, background 0.2s',
+                  cursor:'pointer', color:'rgba(255,255,255,0.85)',
+                  backdropFilter:'blur(6px)',
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor='#0A0A0A'}
-                onMouseLeave={e => e.currentTarget.style.borderColor='rgba(10,10,10,0.2)'}>
+                onMouseEnter={e => { e.currentTarget.style.borderColor='rgba(255,255,255,0.9)'; e.currentTarget.style.background='rgba(255,255,255,0.12)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(255,255,255,0.35)'; e.currentTarget.style.background='transparent'; }}>
                 {s.name.toUpperCase()}
               </a>
             ))}
@@ -47,9 +93,9 @@ function HomePage({ navigate }) {
             <h1 style={{
               fontSize:'clamp(56px,9.5vw,130px)', fontWeight:300,
               letterSpacing:'-0.03em', lineHeight:0.9,
-              textTransform:'lowercase', color:'#0A0A0A', mixBlendMode:'multiply',
+              textTransform:'lowercase', color:'#fff',
             }}>color as identity</h1>
-            <p className="jp" style={{ marginTop:28, fontSize:16, fontWeight:300, letterSpacing:'0.08em', opacity:0.65 }}>
+            <p className="jp" style={{ marginTop:28, fontSize:16, fontWeight:300, letterSpacing:'0.08em', opacity:0.7, color:'#fff' }}>
               髪色で、自分を描く。
             </p>
           </div>
@@ -59,14 +105,17 @@ function HomePage({ navigate }) {
             position:'absolute', bottom:40, left:'50%', transform:'translateX(-50%)',
             display:'flex', flexDirection:'column', alignItems:'center', gap:10, zIndex:3,
           }}>
-            <span style={{ fontSize:9, letterSpacing:'0.25em', textTransform:'uppercase', opacity:0.35 }}>scroll</span>
+            <span style={{ fontSize:9, letterSpacing:'0.25em', textTransform:'uppercase', opacity:0.45, color:'#fff' }}>scroll</span>
             <div style={{
               width:1, height:60,
-              background:'linear-gradient(to bottom,#0A0A0A,transparent)',
+              background:'linear-gradient(to bottom,rgba(255,255,255,0.7),transparent)',
               animation:'scrollLine 2s ease-in-out infinite', transformOrigin:'top',
             }}/>
           </div>
         </div>
+
+        {/* Spacer so next section slides up over the sticky hero */}
+        <div style={{ height:'40vh' }}/>
       </div>
     );
   }
@@ -186,26 +235,34 @@ function HomePage({ navigate }) {
   }
 
   // ── Instagram strip ──────────────────────────────────
+  function IgItem({ src, idx }) {
+    const [hov, setHov] = useHomeState(false);
+    return (
+      <a href="https://www.instagram.com/k.e.y.hair.and.make/" target="_blank"
+        onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        style={{ aspectRatio:'1', position:'relative', overflow:'hidden', cursor:'pointer', display:'block',
+          background:`#f0f0f0` }}>
+        {src
+          ? <img src={src} alt={`k.e.y instagram ${idx+1}`} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', transform: hov ? 'scale(1.08)' : 'scale(1)', transition:'transform 0.5s cubic-bezier(.16,1,.3,1)' }}/>
+          : <div style={{ width:'100%', height:'100%', background:`repeating-linear-gradient(0deg,#f0f0f0 0,#f0f0f0 1px,#f8f8f8 1px,#f8f8f8 10px)`, display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Courier New,monospace', fontSize:8, color:'rgba(10,10,10,0.18)' }}>IG post</span></div>
+        }
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#8FB8E6,#F4C4D1,#C8B4E0)', opacity: hov ? 0.4 : 0, transition:'opacity 0.35s', mixBlendMode:'multiply' }}/>
+      </a>
+    );
+  }
+
   function InstagramSection() {
+    const imgs = KEY_DATA.igImgs || [];
     return (
       <section style={{ padding:'80px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
           <Reveal><SectionLabel>instagram</SectionLabel></Reveal>
-          <Reveal><ArrowLink href="https://instagram.com" target="_blank">@k.e.y_harajuku on instagram</ArrowLink></Reveal>
+          <Reveal><ArrowLink href="https://www.instagram.com/k.e.y.hair.and.make/" target="_blank">@k.e.y.hair.and.make on instagram</ArrowLink></Reveal>
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:3 }} className="grid-ig">
-          {Array.from({length:6},(_,i) => {
-            const [hov, setHov] = useHomeState(false);
-            return (
-              <div key={i}
-                onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-                style={{ aspectRatio:'1', position:'relative', overflow:'hidden', cursor:'pointer',
-                  background:`repeating-linear-gradient(0deg,#f0f0f0 0,#f0f0f0 1px,#f8f8f8 1px,#f8f8f8 10px)` }}>
-                <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#8FB8E6,#F4C4D1,#C8B4E0)', opacity: hov ? 0.45 : 0, transition:'opacity 0.35s' }}/>
-                <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Courier New,monospace', fontSize:8, color:'rgba(10,10,10,0.18)', letterSpacing:'0.1em' }}>IG post</div>
-              </div>
-            );
-          })}
+          {Array.from({length:6}, (_, i) => (
+            <IgItem key={i} src={imgs[i]} idx={i}/>
+          ))}
         </div>
       </section>
     );

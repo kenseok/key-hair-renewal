@@ -18,23 +18,23 @@ function AccessPage({ navigate }) {
               {/* Map */}
               <div style={{ paddingRight:60 }}>
                 <div style={{
-                  aspectRatio:'16/10', background:'#161616',
+                  aspectRatio:'16/10',
                   border:'1px solid rgba(255,255,255,0.08)',
-                  position:'relative', overflow:'hidden',
+                  overflow:'hidden',
                   marginBottom:20,
                 }}>
-                  <div dangerouslySetInnerHTML={{ __html: salon.mapSvg }}
-                    style={{ position:'absolute', inset:0, width:'100%', height:'100%' }}/>
-                  <div style={{
-                    position:'absolute', inset:0, display:'flex', alignItems:'center',
-                    justifyContent:'center', pointerEvents:'none',
-                  }}>
-                    <div style={{
-                      fontFamily:'Courier New,monospace', fontSize:9,
-                      color:'rgba(255,255,255,0.12)', letterSpacing:'0.12em',
-                      textAlign:'center', lineHeight:2,
-                    }}>map placeholder<br/>{salon.name}</div>
-                  </div>
+                  {salon.mapEmbed
+                    ? <iframe
+                        src={salon.mapEmbed}
+                        width="100%" height="100%"
+                        style={{ border:0, display:'block', filter:'invert(0.9) hue-rotate(180deg) saturate(0.35)' }}
+                        allowFullScreen loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`Map — ${salon.name}`}/>
+                    : <div style={{ width:'100%', height:'100%', background:'#161616', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        <span style={{ fontFamily:'Courier New,monospace', fontSize:9, color:'rgba(255,255,255,0.15)', letterSpacing:'0.12em' }}>map — {salon.name}</span>
+                      </div>
+                  }
                 </div>
                 <a href={`#/salon/${salon.id}`}
                   onClick={e => { e.preventDefault(); navigate(`/salon/${salon.id}`); }}

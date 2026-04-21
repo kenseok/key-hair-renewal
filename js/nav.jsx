@@ -47,7 +47,7 @@ function Nav({ route, navigate }) {
           <NavLink href="#/about" active={route==='/about'} light={false}>about</NavLink>
 
           {/* Salons dropdown */}
-          <div style={{ position:'relative' }}
+          <div style={{ position:'relative', display:'flex', alignItems:'center' }}
             onMouseEnter={() => setSalonsOpen(true)}
             onMouseLeave={() => setSalonsOpen(false)}>
             <NavLink href="#/salon/harajuku" active={route.startsWith('/salon')} light={false}>salons</NavLink>
@@ -143,7 +143,7 @@ function Nav({ route, navigate }) {
               onClick={e => { e.preventDefault(); go(path); setMenuOpen(false); }}
               style={{
                 fontSize:24, fontWeight:300, letterSpacing:'-0.01em',
-                textTransform:'lowercase', color:'#0A0A0A',
+                textTransform:'lowercase', color:'rgba(10,10,10,0.5)',
               }}>{label}</a>
           ))}
         </div>
