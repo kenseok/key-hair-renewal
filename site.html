@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>k.e.y hair & make — renewal proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+/* ─── RESET ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Inter','Helvetica Neue',Arial,sans-serif;
+  background:#fff; color:#0A0A0A;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a { text-decoration:none; color:inherit; }
+button { font-family:inherit; }
+input, textarea { font-family:inherit; }
+img { display:block; max-width:100%; }
+
+/* ─── JAPANESE ───────────────────────────────────────── */
+.jp { font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif; }
+
+/* ─── KEYFRAMES ──────────────────────────────────────── */
+@keyframes blobMorph {
+  0%   { border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; transform:translate(-50%,-50%) rotate(0deg); }
+  25%  { border-radius:30% 70% 70% 30% / 30% 30% 70% 70%; }
+  50%  { border-radius:50% 50% 30% 70% / 70% 50% 50% 30%; transform:translate(-50%,-50%) rotate(180deg); }
+  75%  { border-radius:70% 30% 50% 50% / 40% 70% 30% 60%; }
+  100% { border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; transform:translate(-50%,-50%) rotate(360deg); }
+}
+@keyframes swatchShift {
+  0%,100% { background:linear-gradient(135deg,#8FB8E6 0%,#F4C4D1 50%,#C8B4E0 100%); }
+  33%     { background:linear-gradient(225deg,#C8B4E0 0%,#8FB8E6 50%,#F4C4D1 100%); }
+  66%     { background:linear-gradient(315deg,#F4C4D1 0%,#C8B4E0 50%,#8FB8E6 100%); }
+}
+@keyframes scrollLine {
+  0%,100% { transform:scaleY(1); opacity:0.4; }
+  50%     { transform:scaleY(0.5); opacity:0.1; }
+}
+
+/* ─── RESPONSIVE GRIDS ───────────────────────────────── */
+@media(max-width:768px) {
+  .grid-responsive-3 { grid-template-columns:1fr !important; }
+  .grid-responsive-2 { grid-template-columns:1fr !important; }
+  .grid-ig           { grid-template-columns:repeat(3,1fr) !important; }
+  section[style] { padding:60px 24px !important; }
+  .page-hero-inner { padding:120px 24px 60px !important; }
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:#f0f0f0; }
+::-webkit-scrollbar-thumb { background:#ccc; }
+::-webkit-scrollbar-thumb:hover { background:#aaa; }
+
+/* ─── SELECTION ──────────────────────────────────────── */
+::selection { background:rgba(143,184,230,0.3); }
+
+/* ─── TWEAKS PANEL ───────────────────────────────────── */
+#tweaks-panel {
+  position:fixed; bottom:24px; right:24px; z-index:9999;
+  background:#fff; border:1px solid #0A0A0A;
+  padding:20px; width:240px; display:none;
+}
+#tweaks-panel.open { display:block; }
+.tweaks-title { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:16px; font-weight:500; }
+.tweak-row { margin-bottom:14px; }
+.tweak-label { font-size:10px; letter-spacing:0.1em; opacity:0.5; text-transform:uppercase; display:block; margin-bottom:6px; }
+.tweak-options { display:flex; gap:6px; flex-wrap:wrap; }
+.tweak-opt {
+  font-size:10px; padding:4px 10px;
+  border:1px solid #ccc; cursor:pointer; transition:all 0.2s;
+  letter-spacing:0.05em; background:#fff;
+}
+.tweak-opt.active, .tweak-opt:hover { border-color:#0A0A0A; background:#0A0A0A; color:#fff; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- ─── Tweaks panel ─────────────────────────────────── -->
+<div id="tweaks-panel">
+  <div class="tweaks-title">Tweaks</div>
+  <div class="tweak-row">
+    <span class="tweak-label">Accent opacity</span>
+    <div class="tweak-options">
+      <div class="tweak-opt" onclick="setBlobOpacity(0.2,this)">subtle</div>
+      <div class="tweak-opt active" onclick="setBlobOpacity(0.35,this)">mid</div>
+      <div class="tweak-opt" onclick="setBlobOpacity(0.55,this)">bold</div>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <span class="tweak-label">Type weight</span>
+    <div class="tweak-options">
+      <div class="tweak-opt active" onclick="setTypeWeight(300,this)">thin</div>
+      <div class="tweak-opt" onclick="setTypeWeight(400,this)">regular</div>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <span class="tweak-label">Background</span>
+    <div class="tweak-options">
+      <div class="tweak-opt active" onclick="setBg('#fff',this)">white</div>
+      <div class="tweak-opt" onclick="setBg('#FAFAFA',this)">off-white</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Data ────────────────────────────────────────── -->
+<script src="js/data.js"></script>
+
+<!-- ─── React components ────────────────────────────── -->
+<script type="text/babel" src="js/components.jsx"></script>
+<script type="text/babel" src="js/nav.jsx"></script>
+<script type="text/babel" src="js/footer.jsx"></script>
+
+<!-- ─── Pages ───────────────────────────────────────── -->
+<script type="text/babel" src="js/home.jsx"></script>
+<script type="text/babel" src="js/salon.jsx"></script>
+<script type="text/babel" src="js/price.jsx"></script>
+<script type="text/babel" src="js/gallery.jsx"></script>
+<script type="text/babel" src="js/stylists.jsx"></script>
+<script type="text/babel" src="js/journal.jsx"></script>
+<script type="text/babel" src="js/about.jsx"></script>
+<script type="text/babel" src="js/access.jsx"></script>
+<script type="text/babel" src="js/contact.jsx"></script>
+
+<!-- ─── App (router) ────────────────────────────────── -->
+<script type="text/babel" src="js/app.jsx"></script>
+
+<!-- ─── Tweaks logic ────────────────────────────────── -->
+<script>
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode')   document.getElementById('tweaks-panel').classList.add('open');
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').classList.remove('open');
+});
+window.parent.postMessage({ type:'__edit_mode_available' }, '*');
+
+function setActive(el) {
+  el.closest('.tweak-options').querySelectorAll('.tweak-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+}
+function setBlobOpacity(o, el) {
+  setActive(el);
+  document.querySelectorAll('[style*="blobMorph"]').forEach(b => b.style.opacity = o);
+}
+function setTypeWeight(w, el) {
+  setActive(el);
+  document.querySelectorAll('h1,h2,h3').forEach(h => {
+    if (parseFloat(getComputedStyle(h).fontWeight) <= 400) h.style.fontWeight = w;
+  });
+}
+function setBg(c, el) {
+  setActive(el);
+  document.querySelectorAll('[style*="background: rgb(255"]').forEach(el => el.style.background = c);
+  document.body.style.background = c;
+}
+</script>
+</body>
+</html>
